@@ -1,0 +1,33 @@
+# Environment
+.env
+.env.*
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environment
+venv/
+.venv/
+
+# Django
+db.sqlite3
+*.log
+
+# Media
+media/
+
+# ChromaDB
+vectorstore/
+
+# Vectorstore backup
+vectorstore-backup.tar.gz
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

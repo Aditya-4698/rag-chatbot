@@ -1,0 +1,106 @@
+services:
+
+  web:
+    build: .
+    container_name: rag-web
+    command: python manage.py runserver 0.0.0.0:8000
+
+    volumes:
+      - .:/app
+      - media_data:/app/media
+      - vector_data:/app/vectorstore
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - .env
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/')"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+
+  db:
+    image: postgres:16
+    container_name: rag-db
+
+    environment:
+      POSTGRES_DB: rag_chatbot
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    ports:
+      - "5432:5432"
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U postgres -d rag_chatbot"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  redis:
+    image: redis:7
+    container_name: rag-redis
+
+    ports:
+      - "6379:6379"
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "ping"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  celery:
+    build: .
+    container_name: rag-celery
+    command: celery -A config worker --loglevel=info --pool=solo
+
+    volumes:
+      - .:/app
+      - media_data:/app/media
+      - vector_data:/app/vectorstore
+
+    env_file:
+      - .env
+
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+
+volumes:
+  postgres_data:
+  media_data:
+  vector_data:
