@@ -3,8 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Document
 from .serializers import DocumentSerializer
-# from .services.processor import process_document
-from .tasks import process_document_task
+from .services.processor import process_document
+# from .tasks import process_document_task
 from .services.vector_store import delete_document_chunks
 
 from django.shortcuts import render
@@ -29,7 +29,8 @@ class DocumentListCreateView(generics.ListCreateAPIView):
             file_type=file.name.split(".")[-1].lower(),
         )
 
-        process_document_task.delay(document.id)
+        # process_document_task.delay(document.id)
+        process_document(document)
 
 
 class DocumentDetailView(generics.RetrieveUpdateDestroyAPIView):
