@@ -3,12 +3,13 @@ services:
   web:
     build: .
     container_name: rag-web
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 3 --timeout 120
 
     volumes:
       - .:/app
       - media_data:/app/media
       - vector_data:/app/vectorstore
+      - static_data:/app/staticfiles
 
     ports:
       - "8000:8000"
@@ -104,3 +105,4 @@ volumes:
   postgres_data:
   media_data:
   vector_data:
+  static_data:
