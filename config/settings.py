@@ -216,7 +216,7 @@ CELERY_BROKER_URL = os.getenv(
 )
 
 CELERY_RESULT_BACKEND = os.getenv(
-    "CELERY_RESULT_BACKENED",
+    "CELERY_RESULT_BACKEND",
     "redis://localhost:6379/0",
 )
 
