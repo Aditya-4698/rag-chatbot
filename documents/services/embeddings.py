@@ -4,7 +4,7 @@ from django.conf import settings
 from fastembed import TextEmbedding
 
 
-EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
+EMBEDDING_MODEL = "snowflake/snowflake-arctic-embed-xs"
 
 EMBEDDING_CACHE_DIR = Path(settings.BASE_DIR) / "fastembed_cache"
 
@@ -18,6 +18,7 @@ def get_embedding_model():
         _embedding_model = TextEmbedding(
             model_name=EMBEDDING_MODEL,
             cache_dir=str(EMBEDDING_CACHE_DIR),
+            threads=1,
         )
 
     return _embedding_model

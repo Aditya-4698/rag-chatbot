@@ -1,7 +1,7 @@
 import logging
 import os
 
-import ollama
+from google import genai
 
 from config.exceptions import AIServiceError
 from .prompts import build_rag_prompt
@@ -11,16 +11,16 @@ from .retrieval import retrieve_relevant_chunks
 logger = logging.getLogger(__name__)
 
 
-LLM_MODEL = "llama3.2"
+LLM_MODEL = "gemini-3.5-flash-lite"
 
-OLLAMA_HOST = os.getenv(
-    "OLLAMA_HOST",
-    "http://localhost:11434",
-)
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-client = ollama.Client(
-    host=OLLAMA_HOST
-)
+client = None
+
+if GEMINI_API_KEY:
+    client = genai.Client(
+        api_key=GEMINI_API_KEY
+    )
 
 
 def generate_answer(question, user_id, n_results=5):
@@ -54,40 +54,32 @@ def generate_answer(question, user_id, n_results=5):
         metadata = chunk["metadata"]
 
         sources.append({
-            "document_id": metadata.get(
-                "document_id"
-            ),
-            "page": metadata.get(
-                "page"
-            ),
-            "chunk_index": metadata.get(
-                "chunk_index"
-            ),
+            "document_id": metadata.get("document_id"),
+            "page": metadata.get("page"),
+            "chunk_index": metadata.get("chunk_index"),
         })
 
-    context = "\n\n".join(
-        context_parts
-    )
+    context = "\n\n".join(context_parts)
 
     prompt = build_rag_prompt(
         question=question,
         context=context,
     )
 
+    if client is None:
+        raise AIServiceError(
+            "Gemini API key is not configured."
+        )
+
     try:
-        response = client.chat(
+        response = client.models.generate_content(
             model=LLM_MODEL,
-            messages=[
-                {
-                    "role": "user",
-                    "content": prompt,
-                }
-            ],
+            contents=prompt,
         )
 
     except Exception as exc:
         logger.exception(
-            "Ollama LLM request failed: user_id=%s",
+            "Gemini LLM request failed: user_id=%s",
             user_id,
         )
 
@@ -96,6 +88,6 @@ def generate_answer(question, user_id, n_results=5):
         ) from exc
 
     return {
-        "answer": response["message"]["content"],
+        "answer": response.text,
         "sources": sources,
     }

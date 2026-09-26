@@ -31,3 +31,7 @@ vectorstore-backup.tar.gz
 # OS
 .DS_Store
 Thumbs.db
+
+
+fastembed_cache/
+vectorstore_old/

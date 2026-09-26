@@ -7,3 +7,6 @@ __pycache__/
 db.sqlite3
 vectorstore/
 media/
+fastembed_cache/
+vectorstore_old/
+test_vectorstore/
