@@ -1,22 +1,27 @@
-import os
-import ollama
+from fastembed import TextEmbedding
 
-EMBEDDING_MODEL = "nomic-embed-text"
 
-OLLAMA_HOST = os.getenv(
-    "OLLAMA_HOST",
-    "http://localhost:11434",
-)
+EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"
 
-client = ollama.Client(
-    host=OLLAMA_HOST
-)
+_embedding_model = None
+
+
+def get_embedding_model():
+    global _embedding_model
+
+    if _embedding_model is None:
+        _embedding_model = TextEmbedding(
+            model_name=EMBEDDING_MODEL
+        )
+
+    return _embedding_model
 
 
 def generate_embedding(text):
-    response = client.embed(
-        model=EMBEDDING_MODEL,
-        input=text,
+    model = get_embedding_model()
+
+    embedding = next(
+        model.embed([text])
     )
 
-    return response["embeddings"][0]
+    return embedding.tolist()

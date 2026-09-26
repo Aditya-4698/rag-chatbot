@@ -214,16 +214,17 @@ REST_FRAMEWORK = {
 REDIS_URL = os.getenv("REDIS_URL")
 
 CELERY_BROKER_URL = REDIS_URL
-
 CELERY_RESULT_BACKEND = REDIS_URL
 
-CELERY_BROKER_USE_SSL = {
-    "ssl_cert_reqs": ssl.CERT_NONE,
-}
+# Enable SSL only when using rediss://
+if REDIS_URL and REDIS_URL.startswith("rediss://"):
+    CELERY_BROKER_USE_SSL = {
+        "ssl_cert_reqs": ssl.CERT_NONE,
+    }
 
-CELERY_REDIS_BACKEND_USE_SSL = {
-    "ssl_cert_reqs": ssl.CERT_NONE,
-}
+    CELERY_REDIS_BACKEND_USE_SSL = {
+        "ssl_cert_reqs": ssl.CERT_NONE,
+    }
 
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
