@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 
 from pathlib import Path
 import os
+import ssl
 
 import dj_database_url
 
@@ -221,11 +222,11 @@ CELERY_RESULT_BACKEND = os.getenv(
 )
 
 CELERY_BROKER_USE_SSL = {
-    "ssl_cert_reqs": "CERT_NONE",
+    "ssl_cert_reqs": ssl.CERT_NONE,
 }
 
 CELERY_REDIS_BACKEND_USE_SSL = {
-    "ssl_cert_reqs": "CERT_NONE",
+    "ssl_cert_reqs": ssl.CERT_NONE,
 }
 
 CELERY_ACCEPT_CONTENT = ["json"]
