@@ -220,12 +220,17 @@ CELERY_RESULT_BACKEND = os.getenv(
     "redis://localhost:6379/0",
 )
 
+CELERY_BROKER_USE_SSL = {
+    "ssl_cert_reqs": "CERT_NONE",
+}
+
+CELERY_REDIS_BACKEND_USE_SSL = {
+    "ssl_cert_reqs": "CERT_NONE",
+}
+
 CELERY_ACCEPT_CONTENT = ["json"]
-
 CELERY_TASK_SERIALIZER = "json"
-
 CELERY_RESULT_SERIALIZER = "json"
-
 CELERY_TIMEZONE = "Asia/Kolkata"
 
 
